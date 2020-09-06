@@ -18,7 +18,8 @@ export class Store {
     return this._dbp.then(db => new Promise<void>((resolve, reject) => {
       const transaction = db.transaction(this.storeName, type);
       transaction.oncomplete = () => resolve();
-      transaction.onabort = transaction.onerror = () => reject(transaction.error);
+      transaction.onerror = () => reject(transaction.error);
+      transaction.onabort = (event) => reject((<IDBRequest>event.target).error);
       callback(transaction.objectStore(this.storeName));
     }));
   }
